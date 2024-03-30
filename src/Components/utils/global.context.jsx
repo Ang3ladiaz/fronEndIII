@@ -1,15 +1,48 @@
-import { createContext } from "react";
+import { createContext, useContext, useState } from "react";
 
-export const initialState = {theme: "", data: []}
+const UserStates = createContext();
 
-export const ContextGlobal = createContext(undefined);
+let initialState = {
 
-export const ContextProvider = ({ children }) => {
-  //Aqui deberan implementar la logica propia del Context, utilizando el hook useMemo
+  favs: [],
+  cart: [],
+  darkMode: false,
+};
+
+const UsersReducer= ( state, action)=>{
+
+  Swith (action.type){
+    case "ADD_FAVORITES":
+      return {...state, favs:[...state.favs, action.payload]};
+    case "REMOVE_BY_ID":
+      let newArr = state.favs.filter(
+        (user)=> user.id !== action.payload
+      )
+      return {...state,favs:newArr};
+    case "REMOVE_ALL":
+      return {...state,favs:[]};
+    case "CHANGE_MODE":
+      return {...state, darkMode:! state.darkMode};
+    default:
+      return state;
+    };
+};
+
+
+
+const UserContext = ({ children }) => {
+  
+  const [state, dispatch]=useReducer (UsersReducer,initialState);
+
+  let data={state, dispatch}
 
   return (
-    <ContextGlobal.Provider value={{}}>
-      {children}
-    </ContextGlobal.Provider>
+    <UsersState.Provider value= {data}>{children}</UsersState.Provider>
+
   );
 };
+
+export default global.context;
+
+
+export const useUserStates = ()=> useContext (UserStates);
